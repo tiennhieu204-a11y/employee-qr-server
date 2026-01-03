@@ -1,121 +1,135 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>员工码</title>
+
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
 
 <style>
-body {
-    margin: 0;
-    background: #2f3245;
-    font-family: "PingFang SC", -apple-system, BlinkMacSystemFont, sans-serif;
-    color: #fff;
+body{
+  margin:0;
+  background:#2f3443;
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC";
+  color:#fff;
 }
-
-/* ăn sát status bar */
-.safe {
-    padding-top: env(safe-area-inset-top);
+.header{
+  padding:50px 20px 20px;
+  font-size:20px;
+  color:#f5d28b;
 }
-
-.header {
-    padding: 20px 16px 12px;
-    font-size: 18px;
+.panel{
+  width:320px;
+  margin:0 auto;
+  background:#fff;
+  border-radius:10px;
+  overflow:hidden;
+  text-align:center;
+  color:#000;
 }
-
-.card {
-    background: #ffffff;
-    margin: 12px;
-    border-radius: 18px;
-    padding: 18px 16px;
-    text-align: center;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+.tip{
+  background:#f4b400;
+  color:#fff;
+  padding:12px;
+  font-size:14px;
 }
-
-.notice {
-    background: #f6b41b;
-    color: #fff;
-    padding: 10px;
-    border-radius: 10px;
-    font-size: 14px;
-    margin-bottom: 14px;
+.time{
+  margin:12px 0;
+  font-size:14px;
 }
-
-.datetime {
-    font-size: 14px;
-    color: #333;
-    margin-bottom: 8px;
+#qrcode{
+  margin:10px auto;
 }
-
-#qrcode {
-    margin: 14px auto;
+.refresh{
+  font-size:13px;
+  color:#999;
 }
-
-.timer {
-    font-size: 22px;
-    color: #2db84d;
-    margin-top: 6px;
+.status{
+  margin-top:10px;
+  font-size:22px;
+  color:#2ecc71;
 }
-
-.footer {
-    padding: 18px;
-    font-size: 13px;
-    color: #ddd;
-    line-height: 1.5;
+.countdown{
+  font-size:18px;
+  color:#2ecc71;
+  margin-bottom:10px;
+}
+.footer{
+  max-width:320px;
+  margin:20px auto;
+  font-size:13px;
+  color:#ddd;
+  line-height:1.6;
+  text-align:center;
 }
 </style>
 </head>
-<body>
-<div class="safe">
-<div class="header">V25102128 (Mông Tiến Nhiều)</div>
 
-<div class="card">
-  <div class="notice">将二维码对准扫描器扫码进出场</div>
-  <div id="time"></div>
+<body>
+
+<div class="header">
+  V25090035 (Nguyễn Tất Khanh)
+</div>
+
+<div class="panel">
+  <div class="tip">将二维码对准扫描器扫码进出场</div>
+  <div class="time" id="time"></div>
   <div id="qrcode"></div>
-  <div class="timer" id="countdown"></div>
+  <div class="refresh">刷新二维码</div>
+  <div class="status">已生效</div>
+  <div class="countdown" id="countdown">00:00:00</div>
 </div>
 
 <div class="footer">
-您已进入企业涉密区域，手机摄像头将被禁止拍摄
+尊敬的员工您好，您已进入企业涉密区域，出于企业安全考虑，您的手机摄像头将被禁止拍摄，感谢您的配合。
 </div>
 
 <script>
-const SERVER = https://employee-qr-server.onrender.com
-let expireAt = 0;
-
-async function loadQR() {
-  const res = await fetch(`${SERVER}/api/qr`);
-  const data = await res.json();
-  expireAt = data.expireAt;
-
-  document.getElementById("qrcode").innerHTML = "";
-  new QRCode("qrcode", {
-    text: data.token,
-    width: 220,
-    height: 220
-  });
+// ===== HIỂN THỊ THỜI GIAN HIỆN TẠI =====
+function updateTime(){
+  const d = new Date();
+  document.getElementById("time").innerText =
+    `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()} ${d.toTimeString().slice(0,8)}`;
 }
+setInterval(updateTime,1000);
+updateTime();
 
-function tick() {
-  const now = Date.now();
-  let remain = Math.max(0, Math.floor((expireAt - now)/1000));
+// ===== ĐẾM TĂNG TỪ 00:00:00 → 12:00:00 =====
+let totalSeconds = 0;
+const maxSeconds = 12 * 60 * 60;
 
-  let h = String(Math.floor(remain/3600)).padStart(2,'0');
-  let m = String(Math.floor((remain%3600)/60)).padStart(2,'0');
-  let s = String(remain%60).padStart(2,'0');
+setInterval(() => {
+  if (totalSeconds > maxSeconds) return;
 
-  document.getElementById("countdown").innerText = `${h}:${m}:${s}`;
-  document.getElementById("time").innerText = new Date().toLocaleString();
+  let h = Math.floor(totalSeconds / 3600);
+  let m = Math.floor((totalSeconds % 3600) / 60);
+  let s = totalSeconds % 60;
 
-  if (remain <= 0) loadQR();
-}
-loadQR();
-setInterval(tick,1000);
+  document.getElementById("countdown").innerText =
+    `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+
+  totalSeconds++;
+}, 1000);
+
+// ===== QR CODE =====
+new QRCode(document.getElementById("qrcode"),{
+  text: JSON.stringify({
+    emp: "V25090035",
+    name: "Nguyen Tat Khanh",
+    zone: "SECURE",
+    start: new Date().toISOString()
+  }),
+  width:220,
+  height:220,
+  correctLevel:QRCode.CorrectLevel.H
+});
 </script>
-</div>
+
 </body>
 </html>
-
