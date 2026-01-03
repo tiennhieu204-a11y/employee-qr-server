@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>员工码</title>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+
+<style>
+body { background:#2f3245; color:#fff; font-family:-apple-system; margin:0 }
+.header { padding:16px }
+.card {
+  background:#fff; margin:16px; border-radius:14px;
+  padding:16px; color:#000; text-align:center;
+}
+.notice { background:#f6b41b; padding:10px; color:#fff; border-radius:8px }
+.timer { color:green; font-size:20px; margin-top:8px }
+.footer { font-size:13px; color:#ccc; padding:16px }
+</style>
+</head>
+
+<body>
+<div class="header">V25102128 (Mông Tiến Nhiều)</div>
+
+<div class="card">
+  <div class="notice">将二维码对准扫描器扫码进出场</div>
+  <div id="time"></div>
+  <div id="qrcode"></div>
+  <div class="timer" id="countdown"></div>
+</div>
+
+<div class="footer">
+您已进入企业涉密区域，手机摄像头将被禁止拍摄
+</div>
+
+<script>
+const SERVER = "RENDER_SERVER_URL";
+let expireAt = 0;
+
+async function loadQR() {
+  const res = await fetch(`${SERVER}/api/qr`);
+  const data = await res.json();
+  expireAt = data.expireAt;
+
+  document.getElementById("qrcode").innerHTML = "";
+  new QRCode("qrcode", {
+    text: data.token,
+    width: 220,
+    height: 220
+  });
+}
+
+function tick() {
+  const now = Date.now();
+  let remain = Math.max(0, Math.floor((expireAt - now)/1000));
+
+  let h = String(Math.floor(remain/3600)).padStart(2,'0');
+  let m = String(Math.floor((remain%3600)/60)).padStart(2,'0');
+  let s = String(remain%60).padStart(2,'0');
+
+  document.getElementById("countdown").innerText = `${h}:${m}:${s}`;
+  document.getElementById("time").innerText = new Date().toLocaleString();
+
+  if (remain <= 0) loadQR();
+}
+loadQR();
+setInterval(tick,1000);
+</script>
+</body>
+</html>
