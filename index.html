@@ -8,18 +8,66 @@
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
 
 <style>
-body { background:#2f3245; color:#fff; font-family:-apple-system; margin:0 }
-.header { padding:16px }
-.card {
-  background:#fff; margin:16px; border-radius:14px;
-  padding:16px; color:#000; text-align:center;
+body {
+    margin: 0;
+    background: #2f3245;
+    font-family: "PingFang SC", -apple-system, BlinkMacSystemFont, sans-serif;
+    color: #fff;
 }
-.notice { background:#f6b41b; padding:10px; color:#fff; border-radius:8px }
-.timer { color:green; font-size:20px; margin-top:8px }
-.footer { font-size:13px; color:#ccc; padding:16px }
+
+/* ăn sát status bar */
+.safe {
+    padding-top: env(safe-area-inset-top);
+}
+
+.header {
+    padding: 20px 16px 12px;
+    font-size: 18px;
+}
+
+.card {
+    background: #ffffff;
+    margin: 12px;
+    border-radius: 18px;
+    padding: 18px 16px;
+    text-align: center;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.notice {
+    background: #f6b41b;
+    color: #fff;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 14px;
+    margin-bottom: 14px;
+}
+
+.datetime {
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+#qrcode {
+    margin: 14px auto;
+}
+
+.timer {
+    font-size: 22px;
+    color: #2db84d;
+    margin-top: 6px;
+}
+
+.footer {
+    padding: 18px;
+    font-size: 13px;
+    color: #ddd;
+    line-height: 1.5;
+}
 </style>
 </head>
-
+<div class="safe">
 <body>
 <div class="header">V25102128 (Mông Tiến Nhiều)</div>
 
